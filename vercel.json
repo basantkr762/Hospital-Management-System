@@ -1,35 +1,12 @@
 {
-  "version": 2,
-  "builds": [
+  "buildCommand": "cd clientside && npm install && npm run build",
+  "outputDirectory": "clientside/dist",
+  "installCommand": "cd clientside && npm install",
+  "framework": null,
+  "rewrites": [
     {
-      "src": "clientside/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "buildCommand": "npm run build",
-        "outputDirectory": "dist"
-      }
-    },
-    {
-      "src": "backend/server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/backend/server.js"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/clientside/dist/assets/$1"
-    },
-    {
-      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|svg|gif|woff|woff2|ttf|eot))",
-      "dest": "/clientside/dist/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/clientside/dist/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
