@@ -84,7 +84,7 @@ After deployment, your URLs will be:
 ```env
 VITE_BACKEND_URL=https://your-app.vercel.app/api
 VITE_ADMIN_URL=/admin
-VITE_APP_NAME=Prescripto
+VITE_APP_NAME=Hospital Management System
 ```
 
 **2. Backend environment variables in Vercel dashboard:**

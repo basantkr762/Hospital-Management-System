@@ -58,9 +58,9 @@ const AdminLogin = () => {
         {/* Header */}
         <div className="w-full text-center mb-4">
           <img 
-            className="w-44 mx-auto mb-4" 
-            src={assets.logo} 
-            alt="Prescripto" 
+            className="w-52 mx-auto mb-4" 
+            src={assets.logoWithText} 
+            alt="Hospital Management System" 
           />
           <p className="text-2xl font-semibold">
             <span className="text-primary">{mode}</span> Access
