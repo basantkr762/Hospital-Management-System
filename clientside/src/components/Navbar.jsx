@@ -7,6 +7,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const { token, setToken, userData } = useContext(AppContext);
+  const adminUrl = import.meta.env.VITE_ADMIN_URL || '/admin';
 
   const [showMenu, setShowMenu] = useState(false);
 
@@ -40,6 +41,10 @@ const Navbar = () => {
           <li className="py-1">CONTACT</li>
           <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
+        <a href={adminUrl} target="_blank" rel="noopener noreferrer">
+          <li className="py-1">Admin Panel</li>
+          <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
+        </a>
       </ul>
       <div className="flex items-center gap-4">
         {token && userData ? (
@@ -108,6 +113,9 @@ const Navbar = () => {
             <NavLink onClick={() => setShowMenu(false)} to="/contact">
               <p className="px-4 py-2 rounded inline-block">CONTACT</p>
             </NavLink>
+            <a href={adminUrl} target="_blank" rel="noopener noreferrer" onClick={() => setShowMenu(false)}>
+              <p className="px-4 py-2 rounded inline-block">Admin Panel</p>
+            </a>
           </ul>
         </div>
       </div>
