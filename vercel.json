@@ -5,8 +5,8 @@
       "src": "clientside/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "buildCommand": "cd clientside && npm install && npm run build",
-        "outputDirectory": "clientside/dist"
+        "buildCommand": "npm run build",
+        "outputDirectory": "dist"
       }
     },
     {
@@ -20,22 +20,16 @@
       "dest": "/backend/server.js"
     },
     {
-      "src": "/admin-panel",
-      "dest": "https://your-admin-deployment.vercel.app"
+      "src": "/assets/(.*)",
+      "dest": "/clientside/dist/assets/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|svg|gif|woff|woff2|ttf|eot))",
+      "dest": "/clientside/dist/$1"
     },
     {
       "src": "/(.*)",
       "dest": "/clientside/dist/index.html"
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/backend/server.js"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/clientside/dist/index.html"
     }
   ]
 }
