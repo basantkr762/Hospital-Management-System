@@ -1,11 +1,41 @@
 {
-  "installCommand": "cd admin && npm install",
-  "buildCommand": "cd admin && npm run build",
-  "outputDirectory": "admin/dist",
+  "version": 2,
+  "builds": [
+    {
+      "src": "clientside/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "cd clientside && npm install && npm run build",
+        "outputDirectory": "clientside/dist"
+      }
+    },
+    {
+      "src": "backend/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/server.js"
+    },
+    {
+      "src": "/admin-panel",
+      "dest": "https://your-admin-deployment.vercel.app"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/clientside/dist/index.html"
+    }
+  ],
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "/backend/server.js"
+    },
+    {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/clientside/dist/index.html"
     }
   ]
 }
