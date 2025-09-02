@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Login from "./pages/Login";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AdminContext } from "./context/AdminContext";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import Dashboard from "./pages/Admin/Dashboard";
 import AllAppointments from "./pages/Admin/AllAppointments";
 import AddDoctor from "./pages/Admin/AddDoctor";
@@ -18,6 +18,19 @@ import DoctorProfile from "./pages/Doctor/DoctorProfile";
 const App = () => {
   const { aToken } = useContext(AdminContext);
   const { dToken } = useContext(DoctorContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Redirect to appropriate dashboard when user is on root path
+    if (location.pathname === '/' && (aToken || dToken)) {
+      if (aToken) {
+        navigate('/admin-dashboard');
+      } else if (dToken) {
+        navigate('/doctor-dashboard');
+      }
+    }
+  }, [aToken, dToken, location.pathname, navigate]);
 
   return aToken || dToken ? (
     <div className="bg-[#F8F9FD]">
@@ -27,7 +40,7 @@ const App = () => {
         <Sidebar />
         <Routes>
           {/* Admin Route */}
-          <Route path="/" element={<></>} />
+          <Route path="/" element={aToken ? <Dashboard /> : dToken ? <DoctorDashboard /> : <></>} />
           <Route path="/admin-dashboard" element={<Dashboard />} />
           <Route path="/all-appointments" element={<AllAppointments />} />
           <Route path="/add-doctor" element={<AddDoctor />} />
