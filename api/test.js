@@ -24,11 +24,11 @@ export default function handler(req, res) {
       'referer': req.headers['referer']
     },
     endpoints: {
-      'POST /api/user/register': 'User registration',
-      'POST /api/user/login': 'User login',
-      'GET /api/user/get-profile': 'Get user profile (requires Authorization or token header)',
-      'GET /api/doctor/list': 'Get doctors list',
-      'POST /api/admin/login': 'Admin login'
+      'POST /api/register': 'User registration',
+      'POST /api/login': 'User login',
+      'GET /api/get-profile': 'Get user profile (requires Authorization or token header)',
+      'GET /api/doctors': 'Get doctors list',
+      'GET /api/test': 'API health check'
     },
     testCredentials: {
       user: 'test@test.com / password123',
