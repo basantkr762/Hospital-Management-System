@@ -18,16 +18,26 @@ module.exports = (req, res) => {
     timestamp: new Date().toISOString(),
     method: req.method,
     url: req.url,
+    headers: {
+      'user-agent': req.headers['user-agent'],
+      'origin': req.headers['origin'],
+      'referer': req.headers['referer']
+    },
     endpoints: {
       'POST /api/user/register': 'User registration',
       'POST /api/user/login': 'User login',
-      'GET /api/user/get-profile': 'Get user profile (requires Authorization header)',
+      'GET /api/user/get-profile': 'Get user profile (requires Authorization or token header)',
       'GET /api/doctor/list': 'Get doctors list',
       'POST /api/admin/login': 'Admin login'
     },
     testCredentials: {
       user: 'test@test.com / password123',
       admin: 'admin@hospital.com / admin123'
+    },
+    deploymentInfo: {
+      environment: 'production',
+      platform: 'vercel',
+      apiFormat: 'serverless functions'
     }
   });
 };

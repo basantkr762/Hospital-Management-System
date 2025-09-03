@@ -1,4 +1,16 @@
 {
+  "version": 2,
   "buildCommand": "cd clientside && npm install && npm run build",
-  "outputDirectory": "clientside/dist"
+  "outputDirectory": "clientside/dist",
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "@vercel/node@18.x"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
+  ]
 }

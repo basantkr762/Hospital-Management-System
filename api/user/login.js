@@ -5,7 +5,7 @@ const users = [
     name: "Test User",
     email: "test@test.com",
     password: "cGFzc3dvcmQxMjM=", // base64 encoded "password123"
-    image: "https://via.placeholder.com/150x150/6366F1/FFFFFF?text=User",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
     address: { line1: "123 Main St", line2: "City Center" },
     gender: "Not Selected",
     dob: "Not Selected",

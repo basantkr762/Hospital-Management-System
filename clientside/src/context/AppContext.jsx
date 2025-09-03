@@ -6,7 +6,8 @@ export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
   const currencySymbol = "$";
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  // Use the same domain for API calls when deployed, localhost for development
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? "http://localhost:5173" : "");
 
   const [doctors, setDoctors] = useState([]);
   const [token, setToken] = useState(
