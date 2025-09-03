@@ -1,33 +1,16 @@
 {
-  "version": 2,
-  "builds": [
+  "buildCommand": "cd clientside && npm install && npm run build",
+  "outputDirectory": "clientside/dist",
+  "installCommand": "cd clientside && npm install",
+  "framework": null,
+  "rewrites": [
     {
-      "src": "clientside/package.json", 
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
     },
     {
-      "src": "api/index.js",
-      "use": "@vercel/node"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "api/index.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "clientside/dist/$1"
-    }
-  ],
-  "env": {
-    "MONGODB_URI": "mongodb+srv://basan:DLTqybe83hWOXqdk@cluster0.68b6a78f7e42b06580894849.mongodb.net",
-    "JWT_SECRET": "hospital_management_system_jwt_secret_2025_secure_key",
-    "ADMIN_EMAIL": "admin@hospital.com", 
-    "ADMIN_PASSWORD": "admin123",
-    "NODE_ENV": "production"
-  }
+  ]
 }

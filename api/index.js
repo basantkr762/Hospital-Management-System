@@ -1,56 +1,44 @@
-import express from "express";
-import cors from "cors";
-import "dotenv/config";
 import connectDB from "../backend/config/mongodb.js";
-import connectCloudinary from "../backend/config/cloudinary.js";
-import adminRouter from "../backend/routes/adminRoute.js";
-import doctorRouter from "../backend/routes/doctorRoute.js";
-import userRouter from "../backend/routes/userRoute.js";
 
-// Initialize Express app
-const app = express();
+// Set environment variables for Vercel
+process.env.MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://basan:DLTqybe83hWOXqdk@cluster0.68b6a78f7e42b06580894849.mongodb.net";
+process.env.JWT_SECRET = process.env.JWT_SECRET || "hospital_management_system_jwt_secret_2025_secure_key";
+process.env.ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@hospital.com";
+process.env.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+process.env.NODE_ENV = "production";
 
-// Connect to database and cloudinary
-connectDB();
-connectCloudinary();
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, token');
 
-// Middlewares
-app.use(express.json());
-app.use(cors({
-  origin: [
-    "https://hospital-vert-iota.vercel.app",
-    "http://localhost:5173",
-    "http://localhost:5174"
-  ],
-  credentials: true
-}));
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
 
-// API endpoints
-app.use("/api/admin", adminRouter);
-app.use("/api/doctor", doctorRouter);
-app.use("/api/user", userRouter);
-
-// Root API endpoint
-app.get("/api", (req, res) => {
-  res.json({ 
-    message: "Hospital Management System API", 
-    status: "connected",
-    timestamp: new Date().toISOString(),
-    endpoints: [
-      "/api/admin",
-      "/api/doctor", 
-      "/api/user"
-    ]
-  });
-});
-
-// Health check
-app.get("/api/health", (req, res) => {
-  res.json({ 
-    status: "healthy",
-    database: "connected",
-    timestamp: new Date().toISOString()
-  });
-});
-
-export default app;
+  try {
+    await connectDB();
+    
+    res.status(200).json({
+      message: "Hospital Management System API",
+      status: "connected",
+      timestamp: new Date().toISOString(),
+      database: "MongoDB Atlas Connected",
+      endpoints: [
+        "/api/admin",
+        "/api/doctor", 
+        "/api/user"
+      ]
+    });
+  } catch (error) {
+    console.error("Database connection error:", error);
+    res.status(500).json({
+      error: "Database connection failed",
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+}
