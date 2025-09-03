@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "buildCommand": "cd clientside && npm install && npm run build",
-  "outputDirectory": "clientside/dist",
   "builds": [
+    {
+      "src": "test-index.html",
+      "use": "@vercel/static"
+    },
     {
       "src": "api/*.js",
       "use": "@vercel/node"
@@ -14,8 +16,8 @@
       "dest": "/api/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "src": "/",
+      "dest": "/test-index.html"
     }
   ]
 }
