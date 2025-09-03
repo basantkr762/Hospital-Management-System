@@ -13,6 +13,14 @@
       "destination": "/api/user/login"
     },
     {
+      "source": "/api/user/get-profile",
+      "destination": "/api/user/get-profile"
+    },
+    {
+      "source": "/api/doctor/list",
+      "destination": "/api/doctor/list"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },

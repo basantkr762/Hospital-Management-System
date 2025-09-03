@@ -40,7 +40,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  if (req.method !== 'POST') {
+  if (req.method !== 'GET') {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
 
@@ -48,46 +48,49 @@ export default async function handler(req, res) {
     // Connect to database
     await connectDB();
 
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ success: false, message: "Email and password are required" });
+    // Get token from headers
+    const token = req.headers.token;
+    
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Not Authorized. Login Again" });
     }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ success: false, message: "Please enter a valid email" });
+    // Decode token (from base64)
+    let decoded;
+    try {
+      const decodedStr = Buffer.from(token, 'base64').toString();
+      decoded = JSON.parse(decodedStr);
+    } catch (error) {
+      return res.status(401).json({ success: false, message: "Invalid token" });
     }
 
     // Get User model
     const User = mongoose.models.User || mongoose.model("User", userSchema);
 
-    // Find user
-    const user = await User.findOne({ email });
+    // Find user by ID
+    const user = await User.findById(decoded.id).select('-password');
     if (!user) {
-      return res.status(400).json({ success: false, message: "User does not exist" });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Check password (decode from base64)
-    const storedPassword = Buffer.from(user.password, 'base64').toString();
-    if (storedPassword !== password) {
-      return res.status(400).json({ success: false, message: "Invalid credentials" });
-    }
-
-    // Create simple JWT token (base64 encoded user ID)
-    const token = Buffer.from(JSON.stringify({ id: user._id, email: user.email })).toString('base64');
-
-    console.log("Login successful for:", email);
+    console.log("Profile retrieved for:", user.email);
 
     res.status(200).json({
       success: true,
-      message: "Login successful",
-      token
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        image: user.image,
+        address: user.address,
+        gender: user.gender,
+        dob: user.dob,
+        phone: user.phone
+      }
     });
 
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Get profile error:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
