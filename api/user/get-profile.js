@@ -5,7 +5,7 @@ const users = [
     name: "Test User",
     email: "test@test.com",
     password: "cGFzc3dvcmQxMjM=", // base64 encoded "password123"
-    image: "https://via.placeholder.com/150?text=User",
+    image: "https://via.placeholder.com/150x150/6366F1/FFFFFF?text=User",
     address: { line1: "123 Main St", line2: "City Center" },
     gender: "Not Selected",
     dob: "Not Selected",
@@ -18,7 +18,7 @@ module.exports = (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, token');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -30,10 +30,14 @@ module.exports = (req, res) => {
   }
 
   try {
+    // Accept token from either Authorization header or token header
     const authHeader = req.headers.authorization;
-    const token = authHeader?.replace('Bearer ', '') || authHeader;
+    const tokenHeader = req.headers.token;
+    const token = authHeader?.replace('Bearer ', '') || authHeader || tokenHeader;
     
-    console.log('Get profile request with token:', token ? 'present' : 'missing');
+    console.log('Get profile request - Authorization header:', authHeader ? 'present' : 'missing');
+    console.log('Get profile request - Token header:', tokenHeader ? 'present' : 'missing');
+    console.log('Final token:', token ? 'present' : 'missing');
 
     if (!token) {
       return res.status(401).json({ 
@@ -62,7 +66,7 @@ module.exports = (req, res) => {
     
     res.status(200).json({
       success: true,
-      userData
+      user: userData // Changed from userData to user to match frontend expectation
     });
 
   } catch (error) {
