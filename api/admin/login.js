@@ -4,11 +4,12 @@ const adminCredentials = {
   password: "admin123"
 };
 
-export default function handler(req, res) {
-  // Enable CORS
+module.exports = (req, res) => {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -22,6 +23,8 @@ export default function handler(req, res) {
   try {
     const { email, password } = req.body;
 
+    console.log('Admin login attempt:', { email, passwordLength: password?.length });
+
     if (!email || !password) {
       return res.status(400).json({ 
         success: false, 
@@ -31,6 +34,7 @@ export default function handler(req, res) {
 
     // Check admin credentials
     if (email !== adminCredentials.email || password !== adminCredentials.password) {
+      console.log('Invalid admin credentials');
       return res.status(400).json({ 
         success: false, 
         message: 'Invalid credentials' 
@@ -39,6 +43,7 @@ export default function handler(req, res) {
 
     // Create admin token
     const aToken = Buffer.from('admin_' + Date.now()).toString('base64');
+    console.log('Admin login successful');
 
     res.status(200).json({
       success: true,
@@ -50,7 +55,8 @@ export default function handler(req, res) {
     console.error('Admin login error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Internal server error' 
+      message: 'Internal server error',
+      error: error.message
     });
   }
-}
+};
