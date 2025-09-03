@@ -1,32 +1,17 @@
-import mongoose from "mongoose";
-
-// MongoDB connection
-const connectDB = async () => {
-  if (mongoose.connections[0].readyState === 1) {
-    return;
+// Simple in-memory storage for development (will be replaced with MongoDB)
+let users = [
+  {
+    _id: "user1",
+    name: "Test User",
+    email: "test@test.com",
+    password: "cGFzc3dvcmQxMjM=", // base64 encoded "password123"
+    image: "https://via.placeholder.com/150?text=User",
+    address: { line1: "123 Main St", line2: "City Center" },
+    gender: "Not Selected",
+    dob: "Not Selected",
+    phone: "0000000000"
   }
-  
-  try {
-    const mongoUri = "mongodb+srv://basan:DLTqybe83hWOXqdk@cluster0.68b6a78f7e42b06580894849.mongodb.net";
-    await mongoose.connect(`${mongoUri}/Hospital-Management-System`);
-    console.log("MongoDB connected successfully");
-  } catch (error) {
-    console.error("MongoDB connection error:", error);
-    throw error;
-  }
-};
-
-// User Schema
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  image: { type: String, default: "https://via.placeholder.com/150?text=User" },
-  address: { type: Object, default: { line1: "", line2: "" } },
-  gender: { type: String, default: "Not Selected" },
-  dob: { type: String, default: "Not Selected" },
-  phone: { type: String, default: "0000000000" }
-}, { timestamps: true });
+];
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -45,8 +30,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Connect to database
-    await connectDB();
+    console.log("Login endpoint called");
+    console.log("Request body:", req.body);
 
     const { email, password } = req.body;
 
@@ -60,23 +45,29 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, message: "Please enter a valid email" });
     }
 
-    // Get User model
-    const User = mongoose.models.User || mongoose.model("User", userSchema);
+    console.log("Looking for user with email:", email);
 
-    // Find user
-    const user = await User.findOne({ email });
+    // Find user in memory storage
+    const user = users.find(u => u.email === email);
     if (!user) {
+      console.log("User not found");
       return res.status(400).json({ success: false, message: "User does not exist" });
     }
 
+    console.log("User found:", user.name);
+
     // Check password (decode from base64)
     const storedPassword = Buffer.from(user.password, 'base64').toString();
+    console.log("Password check for:", email);
+    
     if (storedPassword !== password) {
+      console.log("Password mismatch");
       return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
 
-    // Create simple JWT token (base64 encoded user ID)
-    const token = Buffer.from(JSON.stringify({ id: user._id, email: user.email })).toString('base64');
+    // Create simple JWT token (base64 encoded user data)
+    const tokenData = { id: user._id, email: user.email };
+    const token = Buffer.from(JSON.stringify(tokenData)).toString('base64');
 
     console.log("Login successful for:", email);
 
@@ -91,7 +82,8 @@ export default async function handler(req, res) {
     res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message
+      error: error.message,
+      details: "Check server logs for more information"
     });
   }
 }

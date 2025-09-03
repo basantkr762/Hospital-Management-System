@@ -1,32 +1,17 @@
-import mongoose from "mongoose";
-
-// MongoDB connection
-const connectDB = async () => {
-  if (mongoose.connections[0].readyState === 1) {
-    return;
+// Simple in-memory storage for development (will be replaced with MongoDB)
+let users = [
+  {
+    _id: "user1",
+    name: "Test User",
+    email: "test@test.com",
+    password: "cGFzc3dvcmQxMjM=", // base64 encoded "password123"
+    image: "https://via.placeholder.com/150?text=User",
+    address: { line1: "123 Main St", line2: "City Center" },
+    gender: "Not Selected",
+    dob: "Not Selected",
+    phone: "0000000000"
   }
-  
-  try {
-    const mongoUri = "mongodb+srv://basan:DLTqybe83hWOXqdk@cluster0.68b6a78f7e42b06580894849.mongodb.net";
-    await mongoose.connect(`${mongoUri}/Hospital-Management-System`);
-    console.log("MongoDB connected successfully");
-  } catch (error) {
-    console.error("MongoDB connection error:", error);
-    throw error;
-  }
-};
-
-// User Schema
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  image: { type: String, default: "https://via.placeholder.com/150?text=User" },
-  address: { type: Object, default: { line1: "", line2: "" } },
-  gender: { type: String, default: "Not Selected" },
-  dob: { type: String, default: "Not Selected" },
-  phone: { type: String, default: "0000000000" }
-}, { timestamps: true });
+];
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -45,8 +30,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Connect to database
-    await connectDB();
+    console.log("Get profile endpoint called");
 
     // Get token from headers
     const token = req.headers.token;
@@ -55,38 +39,43 @@ export default async function handler(req, res) {
       return res.status(401).json({ success: false, message: "Not Authorized. Login Again" });
     }
 
+    console.log("Token received:", token);
+
     // Decode token (from base64)
     let decoded;
     try {
       const decodedStr = Buffer.from(token, 'base64').toString();
       decoded = JSON.parse(decodedStr);
+      console.log("Decoded token:", decoded);
     } catch (error) {
+      console.log("Token decode error:", error);
       return res.status(401).json({ success: false, message: "Invalid token" });
     }
 
-    // Get User model
-    const User = mongoose.models.User || mongoose.model("User", userSchema);
-
     // Find user by ID
-    const user = await User.findById(decoded.id).select('-password');
+    const user = users.find(u => u._id === decoded.id);
     if (!user) {
+      console.log("User not found for ID:", decoded.id);
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
     console.log("Profile retrieved for:", user.email);
 
+    // Return user data without password
+    const userProfile = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      image: user.image,
+      address: user.address,
+      gender: user.gender,
+      dob: user.dob,
+      phone: user.phone
+    };
+
     res.status(200).json({
       success: true,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        image: user.image,
-        address: user.address,
-        gender: user.gender,
-        dob: user.dob,
-        phone: user.phone
-      }
+      user: userProfile
     });
 
   } catch (error) {
@@ -94,7 +83,8 @@ export default async function handler(req, res) {
     res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message
+      error: error.message,
+      details: "Check server logs for more information"
     });
   }
 }

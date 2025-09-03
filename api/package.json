@@ -1,8 +1,5 @@
 {
   "name": "hospital-api",
   "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "mongoose": "^8.7.0"
-  }
+  "type": "module"
 }

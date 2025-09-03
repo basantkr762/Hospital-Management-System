@@ -9,11 +9,14 @@ export default function handler(req, res) {
     return;
   }
 
+  console.log("Test endpoint called:", req.method, req.url);
+
   res.status(200).json({
-    message: "Hospital Management System API Test",
-    status: "working",
+    message: "Test endpoint working!",
+    status: "success",
     timestamp: new Date().toISOString(),
     method: req.method,
-    url: req.url
+    url: req.url,
+    headers: req.headers
   });
 }
