@@ -34,7 +34,7 @@ const SmartLogin = () => {
         // User authentication
         if (isSignUp) {
           // User registration
-          const { data } = await axios.post(`${backendUrl}/api/user/register`, {
+          const { data } = await axios.post(`${backendUrl}/api/register`, {
             name,
             email,
             password,
@@ -49,7 +49,7 @@ const SmartLogin = () => {
           }
         } else {
           // User login
-          const { data } = await axios.post(`${backendUrl}/api/user/login`, {
+          const { data } = await axios.post(`${backendUrl}/api/login`, {
             email,
             password,
           });

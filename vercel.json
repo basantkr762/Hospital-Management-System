@@ -1,4 +1,21 @@
 {
+  "version": 2,
   "buildCommand": "cd clientside && npm install && npm run build",
-  "outputDirectory": "clientside/dist"
+  "outputDirectory": "clientside/dist",
+  "builds": [
+    {
+      "src": "api/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
 }

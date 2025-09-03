@@ -1,0 +1,80 @@
+// In-memory storage for development
+const users = [
+  {
+    _id: "user1",
+    name: "Test User",
+    email: "test@test.com",
+    password: "cGFzc3dvcmQxMjM=", // base64 encoded "password123"
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+    address: { line1: "123 Main St", line2: "City Center" },
+    gender: "Not Selected",
+    dob: "Not Selected",
+    phone: "0000000000"
+  }
+];
+
+module.exports = (req, res) => {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, token');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ success: false, message: 'Method not allowed' });
+  }
+
+  try {
+    // Accept token from either Authorization header or token header
+    const authHeader = req.headers.authorization;
+    const tokenHeader = req.headers.token;
+    const token = authHeader?.replace('Bearer ', '') || authHeader || tokenHeader;
+    
+    console.log('Get profile request - Authorization header:', authHeader ? 'present' : 'missing');
+    console.log('Get profile request - Token header:', tokenHeader ? 'present' : 'missing');
+    console.log('Final token:', token ? 'present' : 'missing');
+
+    if (!token) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'No token provided' 
+      });
+    }
+
+    // Decode token to get user id
+    const userId = Buffer.from(token, 'base64').toString('utf8');
+    console.log('Decoded user ID:', userId);
+    
+    // Find user by id
+    const user = users.find(u => u._id === userId);
+    if (!user) {
+      console.log('User not found for ID:', userId);
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found' 
+      });
+    }
+
+    // Return user data (without password)
+    const { password, ...userData } = user;
+    console.log('Profile retrieved for:', user.email);
+    
+    res.status(200).json({
+      success: true,
+      user: userData // Changed from userData to user to match frontend expectation
+    });
+
+  } catch (error) {
+    console.error('Get profile error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+};
