@@ -1,21 +1,22 @@
 {
+  "version": 2,
   "buildCommand": "cd clientside && npm install && npm run build",
   "outputDirectory": "clientside/dist",
   "installCommand": "cd clientside && npm install",
-  "framework": null,
-  "functions": {
-    "api/index.js": {
-      "runtime": "@vercel/node"
-    }
-  },
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/clientside/dist/$1"
     }
   ]
 }
