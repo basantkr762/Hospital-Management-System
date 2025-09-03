@@ -1,19 +1,20 @@
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
-import connectDB from "./config/mongodb.js";
-import connectCloudinary from "./config/cloudinary.js";
-import adminRouter from "./routes/adminRoute.js";
-import doctorRouter from "./routes/doctorRoute.js";
-import userRouter from "./routes/userRoute.js";
+import connectDB from "../backend/config/mongodb.js";
+import connectCloudinary from "../backend/config/cloudinary.js";
+import adminRouter from "../backend/routes/adminRoute.js";
+import doctorRouter from "../backend/routes/doctorRoute.js";
+import userRouter from "../backend/routes/userRoute.js";
 
-// app config
+// Initialize Express app
 const app = express();
-const port = process.env.PORT || 4000;
+
+// Connect to database and cloudinary
 connectDB();
 connectCloudinary();
 
-// middlewares
+// Middlewares
 app.use(express.json());
 app.use(cors({
   origin: [
@@ -24,24 +25,31 @@ app.use(cors({
   credentials: true
 }));
 
-// api endpoints
+// API endpoints
 app.use("/api/admin", adminRouter);
 app.use("/api/doctor", doctorRouter);
 app.use("/api/user", userRouter);
 
-app.get("/", (req, res) => {
-  res.send("Hospital Management System API is working!");
-});
-
+// Root API endpoint
 app.get("/api", (req, res) => {
   res.json({ 
     message: "Hospital Management System API", 
     status: "connected",
+    timestamp: new Date().toISOString(),
     endpoints: [
       "/api/admin",
       "/api/doctor", 
       "/api/user"
     ]
+  });
+});
+
+// Health check
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    status: "healthy",
+    database: "connected",
+    timestamp: new Date().toISOString()
   });
 });
 
