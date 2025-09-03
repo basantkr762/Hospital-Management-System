@@ -1,0 +1,21 @@
+{
+  "name": "hospital-management-system",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd clientside && npm install && npm run build && cd ../admin && npm install && npm run build",
+    "install-backend": "cd backend && npm install",
+    "install-frontend": "cd clientside && npm install",
+    "install-admin": "cd admin && npm install",
+    "install-all": "npm run install-backend && npm run install-frontend && npm run install-admin",
+    "dev-backend": "cd backend && npm run server",
+    "dev-frontend": "cd clientside && npm run dev",
+    "dev-admin": "cd admin && npm run dev",
+    "start": "cd backend && npm start"
+  },
+  "workspaces": [
+    "backend",
+    "clientside",
+    "admin"
+  ]
+}
