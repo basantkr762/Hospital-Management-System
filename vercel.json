@@ -1,6 +1,4 @@
 {
   "buildCommand": "cd clientside && npm install && npm run build",
-  "outputDirectory": "clientside/dist",
-  "installCommand": "npm install",
-  "framework": null
+  "outputDirectory": "clientside/dist"
 }
