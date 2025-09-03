@@ -2,62 +2,29 @@
   "version": 2,
   "builds": [
     {
-      "src": "test-index.html",
-      "use": "@vercel/static"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "clientside/dist"
+      }
     },
     {
-      "src": "api/test.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "api/login.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "api/register.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "api/get-profile.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "api/doctors.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "api/index.js",
+      "src": "api/*.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/test",
-      "dest": "/api/test.js"
-    },
-    {
-      "src": "/api/login",
-      "dest": "/api/login.js"
-    },
-    {
-      "src": "/api/register", 
-      "dest": "/api/register.js"
-    },
-    {
-      "src": "/api/get-profile",
-      "dest": "/api/get-profile.js"
-    },
-    {
-      "src": "/api/doctors",
-      "dest": "/api/doctors.js"
-    },
-    {
       "src": "/api/(.*)",
-      "dest": "/api/index.js"
+      "dest": "/api/$1"
     },
     {
-      "src": "/",
+      "src": "/test",
       "dest": "/test-index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }
