@@ -16,11 +16,28 @@ connectCloudinary();
 // middlewares
 app.use(express.json());
 app.use(cors({
-  origin: [
-    "https://hospital-vert-iota.vercel.app",
-    "http://localhost:5173",
-    "http://localhost:5174"
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost for development
+    if (origin.includes('localhost')) return callback(null, true);
+    
+    // Allow any vercel.app domain
+    if (origin.includes('.vercel.app')) return callback(null, true);
+    
+    // Allow specific domains
+    const allowedOrigins = [
+      "https://hospital-8y3b4et0f-basantkr762s-projects.vercel.app",
+      "https://hospital-vert-iota.vercel.app"
+    ];
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 
