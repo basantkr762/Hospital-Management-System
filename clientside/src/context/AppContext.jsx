@@ -17,8 +17,8 @@ const AppContextProvider = (props) => {
 
   const getDoctorsData = async () => {
     try {
-      console.log("Attempting to fetch doctors from:", backendUrl + "/api/doctor/list");
-      const { data } = await axios.get(backendUrl + "/api/doctor/list");
+      console.log("Attempting to fetch doctors from:", backendUrl + "/api/doctors");
+      const { data } = await axios.get(backendUrl + "/api/doctors");
       console.log("Doctors API response:", data);
       if (data.success) {
         setDoctors(data.doctors);
@@ -41,7 +41,7 @@ const AppContextProvider = (props) => {
   const loadUserProfileData = async () => {
     try {
       console.log("Attempting to load user profile with token:", token ? "present" : "missing");
-      const { data } = await axios.get(backendUrl + "/api/user/get-profile", {
+      const { data } = await axios.get(backendUrl + "/api/get-profile", {
         headers: { token },
       });
       console.log("Profile API response:", data);
