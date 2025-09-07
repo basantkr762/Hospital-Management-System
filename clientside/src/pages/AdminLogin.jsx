@@ -26,8 +26,9 @@ const AdminLogin = () => {
         if (data.success) {
           localStorage.setItem("aToken", data.token);
           toast.success("Admin logged in successfully!");
-          // Redirect to deployed admin panel or show admin interface
-          window.location.href = "/admin-panel"; // You can change this to your admin panel URL
+          // Redirect to admin dashboard (you'll need to deploy admin panel separately)
+          // For now, redirect to a placeholder or integrate admin into main app
+          navigate("/admin-dashboard");
         } else {
           toast.error(data.message);
         }
@@ -40,8 +41,8 @@ const AdminLogin = () => {
         if (data.success) {
           localStorage.setItem("dToken", data.token);
           toast.success("Doctor logged in successfully!");
-          // Redirect to deployed admin panel or show doctor interface
-          window.location.href = "/admin-panel"; // You can change this to your admin panel URL
+          // Redirect to doctor dashboard
+          navigate("/doctor-dashboard");
         } else {
           toast.error(data.message);
         }
