@@ -19,7 +19,7 @@ const AdminLogin = () => {
     try {
       if (mode === "Admin") {
         // Admin authentication
-        const { data } = await axios.post(`${backendUrl}/api/admin/login`, {
+        const { data } = await axios.post(`${backendUrl}/api/admin-login`, {
           email,
           password,
         });
@@ -34,7 +34,7 @@ const AdminLogin = () => {
         }
       } else if (mode === "Doctor") {
         // Doctor authentication
-        const { data } = await axios.post(`${backendUrl}/api/doctor/login`, {
+        const { data } = await axios.post(`${backendUrl}/api/doctor-login`, {
           email,
           password,
         });

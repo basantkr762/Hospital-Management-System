@@ -1,15 +1,10 @@
-// In-memory storage for development
-const users = [
+// Admin login endpoint
+const admins = [
   {
-    _id: "user1",
-    name: "Test User",
-    email: "test@test.com",
-    password: "cGFzc3dvcmQxMjM=", // base64 encoded "password123"
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-    address: { line1: "123 Main St", line2: "City Center" },
-    gender: "Not Selected",
-    dob: "Not Selected",
-    phone: "0000000000"
+    _id: "admin1", 
+    email: "admin@hospital.com",
+    password: "YWRtaW4xMjM=", // base64 encoded "admin123"
+    name: "Hospital Admin"
   }
 ];
 
@@ -30,8 +25,8 @@ export default function handler(req, res) {
   }
 
   try {
-    console.log('Raw request body:', req.body);
-    console.log('Request headers:', req.headers);
+    console.log('Admin login - Raw request body:', req.body);
+    console.log('Admin login - Request headers:', req.headers);
     
     // Handle different body parsing scenarios
     let body = req.body;
@@ -49,7 +44,7 @@ export default function handler(req, res) {
 
     const { email, password } = body;
 
-    console.log('Login attempt:', { email, passwordLength: password?.length });
+    console.log('Admin login attempt:', { email, passwordLength: password?.length });
 
     if (!email || !password) {
       return res.status(400).json({ 
@@ -59,10 +54,10 @@ export default function handler(req, res) {
       });
     }
 
-    // Find user by email
-    const user = users.find(u => u.email === email);
-    if (!user) {
-      console.log('User not found:', email);
+    // Find admin by email
+    const admin = admins.find(a => a.email === email);
+    if (!admin) {
+      console.log('Admin not found:', email);
       return res.status(400).json({ 
         success: false, 
         message: 'Invalid credentials' 
@@ -70,29 +65,30 @@ export default function handler(req, res) {
     }
 
     // Check password (base64 decoded)
-    const storedPassword = Buffer.from(user.password, 'base64').toString('utf8');
-    console.log('Password check:', { provided: password, stored: storedPassword });
+    const storedPassword = Buffer.from(admin.password, 'base64').toString('utf8');
+    console.log('Admin password check:', { provided: password, stored: storedPassword });
     
     if (storedPassword !== password) {
-      console.log('Password mismatch');
+      console.log('Admin password mismatch');
       return res.status(400).json({ 
         success: false, 
         message: 'Invalid credentials' 
       });
     }
 
-    // Create token (base64 encoded user id)
-    const token = Buffer.from(user._id).toString('base64');
-    console.log('Login successful for:', email);
+    // Create token (base64 encoded admin id with role)
+    const tokenData = { id: admin._id, role: 'admin' };
+    const token = Buffer.from(JSON.stringify(tokenData)).toString('base64');
+    console.log('Admin login successful for:', email);
 
     res.status(200).json({
       success: true,
-      message: 'Login successful',
+      message: 'Admin login successful',
       token
     });
 
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Admin login error:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Internal server error',

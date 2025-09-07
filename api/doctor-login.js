@@ -1,15 +1,25 @@
-// In-memory storage for development
-const users = [
+// Doctor login endpoint
+const doctors = [
   {
-    _id: "user1",
-    name: "Test User",
-    email: "test@test.com",
-    password: "cGFzc3dvcmQxMjM=", // base64 encoded "password123"
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-    address: { line1: "123 Main St", line2: "City Center" },
-    gender: "Not Selected",
-    dob: "Not Selected",
-    phone: "0000000000"
+    _id: "doc1",
+    email: "richard@hospital.com", 
+    password: "ZG9jdG9yMTIz", // base64 encoded "doctor123"
+    name: "Dr. Richard James",
+    speciality: "General physician"
+  },
+  {
+    _id: "doc2",
+    email: "emily@hospital.com",
+    password: "ZG9jdG9yMTIz", // base64 encoded "doctor123" 
+    name: "Dr. Emily Larson",
+    speciality: "Gynecologist"
+  },
+  {
+    _id: "doc3", 
+    email: "sarah@hospital.com",
+    password: "ZG9jdG9yMTIz", // base64 encoded "doctor123"
+    name: "Dr. Sarah Patel", 
+    speciality: "Dermatologist"
   }
 ];
 
@@ -30,8 +40,8 @@ export default function handler(req, res) {
   }
 
   try {
-    console.log('Raw request body:', req.body);
-    console.log('Request headers:', req.headers);
+    console.log('Doctor login - Raw request body:', req.body);
+    console.log('Doctor login - Request headers:', req.headers);
     
     // Handle different body parsing scenarios
     let body = req.body;
@@ -49,7 +59,7 @@ export default function handler(req, res) {
 
     const { email, password } = body;
 
-    console.log('Login attempt:', { email, passwordLength: password?.length });
+    console.log('Doctor login attempt:', { email, passwordLength: password?.length });
 
     if (!email || !password) {
       return res.status(400).json({ 
@@ -59,10 +69,10 @@ export default function handler(req, res) {
       });
     }
 
-    // Find user by email
-    const user = users.find(u => u.email === email);
-    if (!user) {
-      console.log('User not found:', email);
+    // Find doctor by email
+    const doctor = doctors.find(d => d.email === email);
+    if (!doctor) {
+      console.log('Doctor not found:', email);
       return res.status(400).json({ 
         success: false, 
         message: 'Invalid credentials' 
@@ -70,29 +80,30 @@ export default function handler(req, res) {
     }
 
     // Check password (base64 decoded)
-    const storedPassword = Buffer.from(user.password, 'base64').toString('utf8');
-    console.log('Password check:', { provided: password, stored: storedPassword });
+    const storedPassword = Buffer.from(doctor.password, 'base64').toString('utf8');
+    console.log('Doctor password check:', { provided: password, stored: storedPassword });
     
     if (storedPassword !== password) {
-      console.log('Password mismatch');
+      console.log('Doctor password mismatch');
       return res.status(400).json({ 
         success: false, 
         message: 'Invalid credentials' 
       });
     }
 
-    // Create token (base64 encoded user id)
-    const token = Buffer.from(user._id).toString('base64');
-    console.log('Login successful for:', email);
+    // Create token (base64 encoded doctor id with role)
+    const tokenData = { id: doctor._id, role: 'doctor' };
+    const token = Buffer.from(JSON.stringify(tokenData)).toString('base64');
+    console.log('Doctor login successful for:', email);
 
     res.status(200).json({
       success: true,
-      message: 'Login successful',
+      message: 'Doctor login successful',
       token
     });
 
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Doctor login error:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Internal server error',

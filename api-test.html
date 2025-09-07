@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        button { padding: 10px 20px; margin: 5px; background: #007cba; color: white; border: none; cursor: pointer; }
+        .result { background: #f5f5f5; padding: 10px; margin: 10px 0; white-space: pre-wrap; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+    </style>
+</head>
+<body>
+    <h1>Hospital Management System - API Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Debug Endpoint</h2>
+        <button onclick="testDebug()">Test Debug API</button>
+        <div id="debug-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Doctors API</h2>
+        <button onclick="testDoctors()">Test Doctors API</button>
+        <div id="doctors-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test User Login API</h2>
+        <input type="email" id="email" placeholder="Email (test@test.com)" value="test@test.com">
+        <input type="password" id="password" placeholder="Password (password123)" value="password123">
+        <button onclick="testLogin()">Test User Login</button>
+        <div id="login-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Test Admin Login API</h2>
+        <input type="email" id="admin-email" placeholder="Admin Email (admin@hospital.com)" value="admin@hospital.com">
+        <input type="password" id="admin-password" placeholder="Admin Password (admin123)" value="admin123">
+        <button onclick="testAdminLogin()">Test Admin Login</button>
+        <div id="admin-login-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Test Doctor Login API</h2>
+        <input type="email" id="doctor-email" placeholder="Doctor Email (richard@hospital.com)" value="richard@hospital.com">
+        <input type="password" id="doctor-password" placeholder="Doctor Password (doctor123)" value="doctor123">
+        <button onclick="testDoctorLogin()">Test Doctor Login</button>
+        <div id="doctor-login-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Test Profile API</h2>
+        <input type="text" id="token" placeholder="Token from login">
+        <button onclick="testProfile()">Test Profile</button>
+        <div id="profile-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>7. Test Appointments API</h2>
+        <button onclick="testAppointments()">Test Appointments</button>
+        <div id="appointments-result" class="result"></div>
+    </div>
+
+    <script>
+        const baseURL = window.location.origin;
+
+        async function testDebug() {
+            try {
+                const response = await fetch(`${baseURL}/api/debug`);
+                const data = await response.json();
+                document.getElementById('debug-result').innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('debug-result').className = 'result success';
+            } catch (error) {
+                document.getElementById('debug-result').innerHTML = `Error: ${error.message}`;
+                document.getElementById('debug-result').className = 'result error';
+            }
+        }
+
+        async function testDoctors() {
+            try {
+                const response = await fetch(`${baseURL}/api/doctors`);
+                const data = await response.json();
+                document.getElementById('doctors-result').innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('doctors-result').className = response.ok ? 'result success' : 'result error';
+            } catch (error) {
+                document.getElementById('doctors-result').innerHTML = `Error: ${error.message}`;
+                document.getElementById('doctors-result').className = 'result error';
+            }
+        }
+
+        async function testLogin() {
+            try {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                const response = await fetch(`${baseURL}/api/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                document.getElementById('login-result').innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('login-result').className = response.ok ? 'result success' : 'result error';
+                
+                if (response.ok && data.token) {
+                    document.getElementById('token').value = data.token;
+                }
+            } catch (error) {
+                document.getElementById('login-result').innerHTML = `Error: ${error.message}`;
+                document.getElementById('login-result').className = 'result error';
+            }
+        }
+
+        async function testAdminLogin() {
+            try {
+                const email = document.getElementById('admin-email').value;
+                const password = document.getElementById('admin-password').value;
+                
+                const response = await fetch(`${baseURL}/api/admin-login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                document.getElementById('admin-login-result').innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('admin-login-result').className = response.ok ? 'result success' : 'result error';
+                
+                if (response.ok && data.token) {
+                    document.getElementById('token').value = data.token;
+                }
+            } catch (error) {
+                document.getElementById('admin-login-result').innerHTML = `Error: ${error.message}`;
+                document.getElementById('admin-login-result').className = 'result error';
+            }
+        }
+
+        async function testDoctorLogin() {
+            try {
+                const email = document.getElementById('doctor-email').value;
+                const password = document.getElementById('doctor-password').value;
+                
+                const response = await fetch(`${baseURL}/api/doctor-login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                document.getElementById('doctor-login-result').innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('doctor-login-result').className = response.ok ? 'result success' : 'result error';
+                
+                if (response.ok && data.token) {
+                    document.getElementById('token').value = data.token;
+                }
+            } catch (error) {
+                document.getElementById('doctor-login-result').innerHTML = `Error: ${error.message}`;
+                document.getElementById('doctor-login-result').className = 'result error';
+            }
+        }
+
+        async function testProfile() {
+            try {
+                const token = document.getElementById('token').value;
+                
+                const response = await fetch(`${baseURL}/api/get-profile`, {
+                    method: 'GET',
+                    headers: {
+                        'token': token
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('profile-result').innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('profile-result').className = response.ok ? 'result success' : 'result error';
+            } catch (error) {
+                document.getElementById('profile-result').innerHTML = `Error: ${error.message}`;
+                document.getElementById('profile-result').className = 'result error';
+            }
+        }
+
+        async function testAppointments() {
+            try {
+                const token = document.getElementById('token').value;
+                
+                const response = await fetch(`${baseURL}/api/appointments`, {
+                    method: 'GET',
+                    headers: {
+                        'token': token
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('appointments-result').innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('appointments-result').className = response.ok ? 'result success' : 'result error';
+            } catch (error) {
+                document.getElementById('appointments-result').innerHTML = `Error: ${error.message}`;
+                document.getElementById('appointments-result').className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>
