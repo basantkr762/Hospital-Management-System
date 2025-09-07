@@ -1,0 +1,41 @@
+// Test API endpoint
+export default function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Hospital Management System API is working!",
+    timestamp: new Date().toISOString(),
+    method: req.method,
+    url: req.url,
+    headers: {
+      'user-agent': req.headers['user-agent'],
+      'referer': req.headers['referer']
+    },
+    endpoints: {
+      'POST /api/register': 'User registration',
+      'POST /api/login': 'User login',
+      'GET /api/get-profile': 'Get user profile (requires Authorization or token header)',
+      'GET /api/doctors': 'Get doctors list',
+      'GET /api/test': 'API health check'
+    },
+    testCredentials: {
+      user: 'test@test.com / password123',
+      admin: 'admin@hospital.com / admin123'
+    },
+    deploymentInfo: {
+      environment: 'production',
+      platform: 'vercel',
+      apiFormat: 'serverless functions'
+    }
+  });
+}
