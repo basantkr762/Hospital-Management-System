@@ -45,4 +45,11 @@ app.get("/api", (req, res) => {
   });
 });
 
+// Only start the server if not in a serverless environment
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
+
 export default app;

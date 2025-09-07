@@ -4,8 +4,16 @@
   "private": true,
   "scripts": {
     "build": "cd clientside && npm install && npm run build",
-    "vercel-build": "cd clientside && npm install && npm run build"
+    "vercel-build": "cd clientside && npm install && npm run build",
+    "dev": "concurrently \"npm run backend\" \"npm run client\" \"npm run admin\"",
+    "backend": "cd backend && npm install && npm run server",
+    "client": "cd clientside && npm install && npm run dev",
+    "admin": "cd admin && npm install && npm run dev",
+    "install-all": "npm install && cd backend && npm install && cd ../clientside && npm install && cd ../admin && npm install",
+    "start": "cd backend && npm start"
   },
-  "dependencies": {},
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
   "devDependencies": {}
 }
