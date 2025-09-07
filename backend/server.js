@@ -62,19 +62,34 @@ app.use(cors({
 
 // Database initialization middleware for API routes
 const ensureDB = async (req, res, next) => {
-  if (req.path.startsWith('/api/') && !req.path.includes('/test')) {
+  // Only enforce DB connection for routes that modify data
+  const dbRequiredRoutes = ['/api/user/register', '/api/user/login', '/api/admin/login', '/api/user/book-appointment'];
+  const requiresDB = dbRequiredRoutes.some(route => req.path.includes(route.split('/').pop()));
+  
+  if (requiresDB) {
     try {
       await getDBConnection();
+      console.log("Database connection ensured for:", req.path);
       next();
     } catch (error) {
-      console.error("Database not available:", error);
+      console.error("Database not available for:", req.path, error);
       return res.status(500).json({
         success: false,
         message: "Database connection failed",
-        error: error.message
+        error: error.message,
+        path: req.path
       });
     }
   } else {
+    // For read operations like doctor list, try to connect but don't fail if it doesn't work
+    if (req.path.startsWith('/api/doctor/list')) {
+      try {
+        await getDBConnection();
+        console.log("Database connection attempted for doctor list");
+      } catch (error) {
+        console.log("Database connection failed for doctor list, will use fallback");
+      }
+    }
     next();
   }
 };
@@ -131,6 +146,29 @@ app.get("/api/test", (req, res) => {
     message: "API is working",
     timestamp: new Date().toISOString(),
     environment: process.env.VERCEL ? "vercel-serverless" : "local"
+  });
+});
+
+// Simple doctors endpoint for testing (no database required)
+app.get("/api/doctors-test", (req, res) => {
+  const sampleDoctors = [
+    {
+      _id: "test1",
+      name: "Dr. Test Doctor",
+      image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=200&h=200&fit=crop&crop=face",
+      speciality: "General physician",
+      degree: "MBBS",
+      experience: "4 Years",
+      about: "Test doctor for frontend testing.",
+      fees: 50,
+      available: true
+    }
+  ];
+  
+  res.json({
+    success: true,
+    doctors: sampleDoctors,
+    message: "Test doctors data"
   });
 });
 

@@ -20,7 +20,7 @@ const connectDB = async () => {
       serverSelectionTimeoutMS: 10000, // 10 seconds
       socketTimeoutMS: 20000, // 20 seconds
       bufferCommands: false, // Disable mongoose buffering
-      bufferMaxEntries: 0, // Disable mongoose buffering
+      // bufferMaxEntries is deprecated and removed
     });
     
     console.log("Database connected successfully");
