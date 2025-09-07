@@ -10,8 +10,20 @@ import userRouter from "./routes/userRoute.js";
 // app config
 const app = express();
 const port = process.env.PORT || 4000;
-connectDB();
-connectCloudinary();
+
+// Initialize database and cloudinary connections
+const initializeApp = async () => {
+  try {
+    await connectDB();
+    await connectCloudinary();
+    console.log("All services initialized successfully");
+  } catch (error) {
+    console.error("Failed to initialize services:", error);
+    process.exit(1);
+  }
+};
+
+initializeApp();
 
 // middlewares
 app.use(express.json());
