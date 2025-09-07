@@ -2,11 +2,10 @@
   "version": 2,
   "builds": [
     {
-      "src": "clientside/package.json",
+      "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "buildCommand": "npm run build",
-        "outputDirectory": "dist"
+        "distDir": "clientside/dist"
       }
     },
     {
@@ -14,26 +13,6 @@
       "use": "@vercel/node"
     }
   ],
-  "functions": {
-    "api/test.js": {
-      "runtime": "@vercel/node"
-    },
-    "api/login.js": {
-      "runtime": "@vercel/node"
-    },
-    "api/register.js": {
-      "runtime": "@vercel/node"
-    },
-    "api/get-profile.js": {
-      "runtime": "@vercel/node"
-    },
-    "api/doctors.js": {
-      "runtime": "@vercel/node"
-    },
-    "api/index.js": {
-      "runtime": "@vercel/node"
-    }
-  },
   "routes": [
     {
       "src": "/api/(.*)",
@@ -46,10 +25,6 @@
     {
       "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|svg|gif|woff|woff2|ttf|eot))",
       "dest": "/clientside/dist/$1"
-    },
-    {
-      "src": "/test",
-      "dest": "/test-index.html"
     },
     {
       "src": "/(.*)",
