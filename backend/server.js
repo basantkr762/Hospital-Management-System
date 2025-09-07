@@ -29,6 +29,7 @@ app.use(cors({
     // Allow specific domains
     const allowedOrigins = [
       "https://hospital-8y3b4et0f-basantkr762s-projects.vercel.app",
+      "https://hospital-3ilhy3e1d-basantkr762s-projects.vercel.app",
       "https://hospital-vert-iota.vercel.app"
     ];
     
