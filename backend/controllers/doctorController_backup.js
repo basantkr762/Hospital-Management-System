@@ -18,47 +18,6 @@ const changeAvailability = async (req, res) => {
   }
 };
 
-const getSampleDoctors = () => {
-  return [
-    {
-      _id: "sample1",
-      name: "Dr. Richard James",
-      image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=200&h=200&fit=crop&crop=face",
-      speciality: "General physician",
-      degree: "MBBS",
-      experience: "4 Years",
-      about: "Dr. Richard has a strong commitment to delivering comprehensive medical care.",
-      fees: 50,
-      address: { line1: "17th Cross, Richmond", line2: "Circle, Ring Road, London" },
-      available: true
-    },
-    {
-      _id: "sample2",
-      name: "Dr. Emily Larson",
-      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face",
-      speciality: "Gynecologist",
-      degree: "MBBS",
-      experience: "3 Years",
-      about: "Dr. Emily Larson has a strong commitment to delivering comprehensive medical care.",
-      fees: 60,
-      address: { line1: "27th Cross, Richmond", line2: "Circle, Ring Road, London" },
-      available: true
-    },
-    {
-      _id: "sample3",
-      name: "Dr. Sarah Patel",
-      image: "https://images.unsplash.com/photo-1594824495800-cdf827195e65?w=200&h=200&fit=crop&crop=face",
-      speciality: "Dermatologist",
-      degree: "MBBS",
-      experience: "2 Years",
-      about: "Dr. Sarah Patel has a strong commitment to delivering comprehensive medical care.",
-      fees: 30,
-      address: { line1: "37th Cross, Richmond", line2: "Circle, Ring Road, London" },
-      available: true
-    }
-  ];
-};
-
 const doctorList = async (req, res) => {
   try {
     console.log("Doctor list request received");
@@ -106,6 +65,53 @@ const doctorList = async (req, res) => {
   }
 };
 
+const getSampleDoctors = () => {
+  return [
+    {
+      _id: "sample1",
+      name: "Dr. Richard James",
+      image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=200&h=200&fit=crop&crop=face",
+      speciality: "General physician",
+      degree: "MBBS",
+      experience: "4 Years",
+      about: "Dr. Richard has a strong commitment to delivering comprehensive medical care.",
+      fees: 50,
+      address: { line1: "17th Cross, Richmond", line2: "Circle, Ring Road, London" },
+      available: true
+    },
+    {
+      _id: "sample2",
+      name: "Dr. Emily Larson",
+      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face",
+      speciality: "Gynecologist",
+      degree: "MBBS",
+      experience: "3 Years",
+      about: "Dr. Emily Larson has a strong commitment to delivering comprehensive medical care.",
+      fees: 60,
+      address: { line1: "27th Cross, Richmond", line2: "Circle, Ring Road, London" },
+      available: true
+    },
+    {
+      _id: "sample3",
+      name: "Dr. Sarah Patel",
+      image: "https://images.unsplash.com/photo-1594824495800-cdf827195e65?w=200&h=200&fit=crop&crop=face",
+      speciality: "Dermatologist",
+      degree: "MBBS",
+      experience: "2 Years",
+      about: "Dr. Sarah Patel has a strong commitment to delivering comprehensive medical care.",
+      fees: 30,
+      address: { line1: "37th Cross, Richmond", line2: "Circle, Ring Road, London" },
+      available: true
+    }
+  ];
+};
+  } catch (error) {
+    console.error("Doctor list error:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // API for doctor Login
 const loginDoctor = async (req, res) => {
   try {
@@ -135,6 +141,7 @@ const appointmentsDoctor = async (req, res) => {
   try {
     const { docId } = req.body;
     const appointments = await appointmentModel.find({ docId });
+
     res.json({ success: true, appointments });
   } catch (error) {
     console.log(error);
@@ -147,6 +154,7 @@ const appointmentComplete = async (req, res) => {
   try {
     const { docId, appointmentId } = req.body;
     const appointmentData = await appointmentModel.findById(appointmentId);
+
     if (appointmentData && appointmentData.docId === docId) {
       await appointmentModel.findByIdAndUpdate(appointmentId, {
         isCompleted: true,
@@ -166,6 +174,7 @@ const appointmentCancel = async (req, res) => {
   try {
     const { docId, appointmentId } = req.body;
     const appointmentData = await appointmentModel.findById(appointmentId);
+
     if (appointmentData && appointmentData.docId === docId) {
       await appointmentModel.findByIdAndUpdate(appointmentId, {
         cancelled: true,
@@ -216,11 +225,12 @@ const doctorDashboard = async (req, res) => {
   }
 };
 
-// API to get doctor profile for doctor panel
+// API to get doctor profile for Doctor panel
 const doctorProfile = async (req, res) => {
   try {
     const { docId } = req.body;
     const profileData = await doctorModel.findById(docId).select("-password");
+
     res.json({ success: true, profileData });
   } catch (error) {
     console.log(error);
@@ -228,11 +238,13 @@ const doctorProfile = async (req, res) => {
   }
 };
 
-// API to update doctor profile data from doctor panel
+// API to update doctor profile data from Doctor panel
 const updateDoctorProfile = async (req, res) => {
   try {
     const { docId, fees, address, available } = req.body;
+
     await doctorModel.findByIdAndUpdate(docId, { fees, address, available });
+
     res.json({ success: true, message: "Profile Updated" });
   } catch (error) {
     console.log(error);
@@ -245,8 +257,8 @@ export {
   doctorList,
   loginDoctor,
   appointmentsDoctor,
-  appointmentComplete,
   appointmentCancel,
+  appointmentComplete,
   doctorDashboard,
   doctorProfile,
   updateDoctorProfile,

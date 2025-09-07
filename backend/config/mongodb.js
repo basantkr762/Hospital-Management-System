@@ -12,15 +12,36 @@ const connectDB = async () => {
     mongoose.connection.on("error", (err) => console.log("Database Error:", err));
     mongoose.connection.on("disconnected", () => console.log("Database Disconnected"));
 
-    // Connect with minimal options for serverless
-    const connectionString = `${process.env.MONGODB_URI}/HospitalManagement`;
-    console.log("Attempting to connect to:", connectionString.replace(/\/\/.*@/, '//***:***@'));
+    // Validate MongoDB URI
+    if (!process.env.MONGODB_URI) {
+      throw new Error("MONGODB_URI environment variable is not set");
+    }
+
+    // Connect with serverless-optimized options
+    let connectionString = process.env.MONGODB_URI;
+    
+    // Clean and validate connection string
+    connectionString = connectionString.trim();
+    
+    // Add database name if not present in URI
+    if (!connectionString.includes('/HospitalManagement')) {
+      connectionString = connectionString.includes('?') 
+        ? connectionString.replace('?', '/HospitalManagement?')
+        : `${connectionString}/HospitalManagement`;
+    }
+    
+    console.log("MongoDB URI validation:");
+    console.log("- URI starts with mongodb+srv:", connectionString.startsWith('mongodb+srv://'));
+    console.log("- Connection string length:", connectionString.length);
+    console.log("- Sanitized URI:", connectionString.replace(/\/\/.*@/, '//***:***@'));
     
     await mongoose.connect(connectionString, {
-      serverSelectionTimeoutMS: 10000, // 10 seconds
-      socketTimeoutMS: 20000, // 20 seconds
-      bufferCommands: false, // Disable mongoose buffering
-      // bufferMaxEntries is deprecated and removed
+      serverSelectionTimeoutMS: 15000, // 15 seconds for serverless
+      socketTimeoutMS: 30000, // 30 seconds for serverless
+      // Allow buffering for serverless environments
+      bufferCommands: true,
+      maxPoolSize: 1, // Maintain up to 1 socket connection for serverless
+      minPoolSize: 0, // Maintain 0 minimum connections
     });
     
     console.log("Database connected successfully");
