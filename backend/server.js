@@ -11,19 +11,28 @@ import userRouter from "./routes/userRoute.js";
 const app = express();
 const port = process.env.PORT || 4000;
 
-// Initialize database and cloudinary connections
-const initializeApp = async () => {
-  try {
-    await connectDB();
-    await connectCloudinary();
-    console.log("All services initialized successfully");
-  } catch (error) {
-    console.error("Failed to initialize services:", error);
-    process.exit(1);
+// Initialize services - but don't block the app startup in serverless
+let isInitialized = false;
+
+const initializeServices = async () => {
+  if (!isInitialized) {
+    try {
+      await connectDB();
+      await connectCloudinary();
+      isInitialized = true;
+      console.log("All services initialized successfully");
+    } catch (error) {
+      console.error("Failed to initialize services:", error);
+      // Don't exit in serverless environment
+      if (!process.env.VERCEL) {
+        process.exit(1);
+      }
+    }
   }
 };
 
-initializeApp();
+// Initialize services
+initializeServices();
 
 // middlewares
 app.use(express.json());
@@ -59,6 +68,28 @@ app.use("/api/admin", adminRouter);
 app.use("/api/doctor", doctorRouter);
 app.use("/api/user", userRouter);
 
+// Error handling middleware
+app.use((error, req, res, next) => {
+  console.error("Server Error Details:");
+  console.error("Error Message:", error.message);
+  console.error("Error Stack:", error.stack);
+  console.error("Request URL:", req.url);
+  console.error("Request Method:", req.method);
+  console.error("Request Headers:", req.headers);
+  
+  res.status(500).json({
+    success: false,
+    message: error.message || "Internal Server Error",
+    url: req.url,
+    method: req.method,
+    timestamp: new Date().toISOString(),
+    error: process.env.NODE_ENV === "development" ? {
+      message: error.message,
+      stack: error.stack
+    } : "Server Error"
+  });
+});
+
 app.get("/", (req, res) => {
   res.send("Hospital Management System API is working!");
 });
@@ -67,6 +98,8 @@ app.get("/api", (req, res) => {
   res.json({ 
     message: "Hospital Management System API", 
     status: "connected",
+    timestamp: new Date().toISOString(),
+    environment: process.env.VERCEL ? "serverless" : "local",
     endpoints: [
       "/api/admin",
       "/api/doctor", 
@@ -75,11 +108,50 @@ app.get("/api", (req, res) => {
   });
 });
 
-// Only start the server if not in a serverless environment
-if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+// Test endpoint that doesn't require database
+app.get("/api/test", (req, res) => {
+  res.json({
+    success: true,
+    message: "API is working",
+    timestamp: new Date().toISOString(),
+    environment: process.env.VERCEL ? "vercel-serverless" : "local"
+  });
+});
+
+// Database status endpoint
+app.get("/api/status", async (req, res) => {
+  try {
+    const mongoose = await import('mongoose');
+    const dbStatus = mongoose.default.connection.readyState;
+    const statusMap = {
+      0: 'disconnected',
+      1: 'connected',
+      2: 'connecting',
+      3: 'disconnecting'
+    };
+    
+    res.json({
+      success: true,
+      database: statusMap[dbStatus] || 'unknown',
+      services_initialized: isInitialized,
+      environment: process.env.VERCEL ? "vercel-serverless" : "local",
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Status check failed",
+      error: error.message
+    });
+  }
+});
+
+// Only start the server if not in a serverless environment (like Vercel)
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'production') {
   app.listen(port, () => {
     console.log(`Server running on port ${port}`);
   });
 }
 
+// For Vercel serverless deployment
 export default app;
