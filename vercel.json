@@ -27,6 +27,50 @@
       "dest": "/clientside/dist/$1"
     },
     {
+      "src": "/login",
+      "dest": "/clientside/dist/index.html"
+    },
+    {
+      "src": "/about",
+      "dest": "/clientside/dist/index.html"
+    },
+    {
+      "src": "/contact",
+      "dest": "/clientside/dist/index.html"
+    },
+    {
+      "src": "/doctors",
+      "dest": "/clientside/dist/index.html"
+    },
+    {
+      "src": "/doctors/(.*)",
+      "dest": "/clientside/dist/index.html"
+    },
+    {
+      "src": "/my-profile",
+      "dest": "/clientside/dist/index.html"
+    },
+    {
+      "src": "/my-appointments",
+      "dest": "/clientside/dist/index.html"
+    },
+    {
+      "src": "/appointment/(.*)",
+      "dest": "/clientside/dist/index.html"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "/clientside/dist/index.html"
+    },
+    {
+      "src": "/admin-dashboard",
+      "dest": "/clientside/dist/index.html"
+    },
+    {
+      "src": "/doctor-dashboard",
+      "dest": "/clientside/dist/index.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/clientside/dist/index.html"
     }
