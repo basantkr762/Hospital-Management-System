@@ -66,15 +66,17 @@
             <h3>🔐 Authentication Test</h3>
             <button onclick="testRegister()">Test Registration</button>
             <button onclick="testLogin()">Test Login</button>
+            <button onclick="testProfile()">Test Profile</button>
             <div id="auth-result" class="result"></div>
         </div>
 
         <div class="test-section">
             <h3>📋 Summary</h3>
             <p>✅ React App: Building successfully (282.77 kB)</p>
-            <p>✅ API Functions: 5 endpoints (under 12 limit)</p>
+            <p>✅ API Functions: 7 endpoints (under 12 limit)</p>
             <p>✅ Vercel Config: Simplified configuration</p>
-            <p>🎯 Ready for deployment!</p>
+            <p>✅ Doctors API: Working (3 doctors loaded)</p>
+            <p>🎯 Testing: Registration, Login, Profile APIs</p>
         </div>
     </div>
 
@@ -114,14 +116,19 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        name: 'Test User',
-                        email: 'test@test.com',
+                        name: 'Test User ' + Date.now(),
+                        email: 'test' + Date.now() + '@test.com',
                         password: 'password123'
                     })
                 });
                 const data = await response.json();
                 result.className = 'result success';
                 result.textContent = `✅ Registration test: ${JSON.stringify(data, null, 2)}`;
+                
+                // Store token for further tests
+                if (data.token) {
+                    localStorage.setItem('testToken', data.token);
+                }
             } catch (error) {
                 result.className = 'result error';
                 result.textContent = `❌ Registration failed: ${error.message}`;
@@ -142,9 +149,41 @@
                 const data = await response.json();
                 result.className = 'result success';
                 result.textContent = `✅ Login test: ${JSON.stringify(data, null, 2)}`;
+                
+                // Store token for further tests
+                if (data.token) {
+                    localStorage.setItem('testToken', data.token);
+                }
             } catch (error) {
                 result.className = 'result error';
                 result.textContent = `❌ Login failed: ${error.message}`;
+            }
+        }
+
+        async function testProfile() {
+            const result = document.getElementById('auth-result');
+            const token = localStorage.getItem('testToken');
+            
+            if (!token) {
+                result.className = 'result error';
+                result.textContent = '❌ No token found. Please login first.';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/get-profile`, {
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'token': token
+                    }
+                });
+                const data = await response.json();
+                result.className = 'result success';
+                result.textContent = `✅ Profile test: ${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ Profile failed: ${error.message}`;
             }
         }
 
