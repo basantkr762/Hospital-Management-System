@@ -32,7 +32,7 @@ const MyAppointments = () => {
 
   const getUserAppointments = async () => {
     try {
-      const { data } = await axios.get(backendUrl + "/api/user/appointments", {
+      const { data } = await axios.get(backendUrl + "/api/appointments", {
         headers: { token },
       });
 
@@ -49,7 +49,7 @@ const MyAppointments = () => {
   const cancelAppointment = async (appointmentId) => {
     try {
       const { data } = await axios.post(
-        backendUrl + "/api/user/cancel-appointment",
+        backendUrl + "/api/cancel-appointment",
         { appointmentId },
         { headers: { token } }
       );
