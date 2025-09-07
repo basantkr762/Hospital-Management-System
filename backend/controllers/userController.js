@@ -9,25 +9,31 @@ import appointmentModel from "../models/appointmentModel.js";
 // API to register user
 const registerUser = async (req, res) => {
   try {
+    console.log("Registration attempt:", req.body);
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
+      console.log("Missing details:", { name: !!name, email: !!email, password: !!password });
       return res.json({ success: false, message: "Missing Details" });
     }
 
     // validating email format
     if (!validator.isEmail(email)) {
+      console.log("Invalid email format:", email);
       return res.json({ success: false, message: "enter a valid email" });
     }
 
     // validating strong password
     if (password.length < 8) {
+      console.log("Password too short:", password.length);
       return res.json({ success: false, message: "enter a strong password" });
     }
 
+    console.log("Attempting to hash password...");
     // hashing user password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    console.log("Password hashed successfully");
 
     const userData = {
       name,
@@ -35,14 +41,19 @@ const registerUser = async (req, res) => {
       password: hashedPassword,
     };
 
+    console.log("Creating new user...");
     const newUser = new userModel(userData);
     const user = await newUser.save();
+    console.log("User saved successfully:", user._id);
 
+    console.log("Generating JWT token...");
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    console.log("JWT token generated successfully");
 
     res.json({ success: true, token });
   } catch (error) {
-    console.log(error);
+    console.error("Registration error:", error);
+    console.error("Error stack:", error.stack);
     res.json({ success: false, message: error.message });
   }
 };

@@ -11,28 +11,23 @@ import userRouter from "./routes/userRoute.js";
 const app = express();
 const port = process.env.PORT || 4000;
 
-// Initialize services - but don't block the app startup in serverless
-let isInitialized = false;
-
-const initializeServices = async () => {
-  if (!isInitialized) {
+// Database connection wrapper
+let dbConnection = null;
+const getDBConnection = async () => {
+  if (!dbConnection) {
     try {
       await connectDB();
       await connectCloudinary();
-      isInitialized = true;
-      console.log("All services initialized successfully");
+      dbConnection = true;
+      console.log("Services initialized successfully");
     } catch (error) {
       console.error("Failed to initialize services:", error);
-      // Don't exit in serverless environment
-      if (!process.env.VERCEL) {
-        process.exit(1);
-      }
+      dbConnection = false;
+      throw error;
     }
   }
+  return dbConnection;
 };
-
-// Initialize services
-initializeServices();
 
 // middlewares
 app.use(express.json());
@@ -51,19 +46,40 @@ app.use(cors({
     const allowedOrigins = [
       "https://hospital-8y3b4et0f-basantkr762s-projects.vercel.app",
       "https://hospital-3ilhy3e1d-basantkr762s-projects.vercel.app",
+      "https://hospital-280hlhlgj-basantkr762s-projects.vercel.app", 
+      "https://hospital-gpcu22rlm-basantkr762s-projects.vercel.app",
       "https://hospital-vert-iota.vercel.app"
     ];
     
     if (allowedOrigins.indexOf(origin) !== -1) {
       return callback(null, true);
     }
-    
+
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
 
-// api endpoints
+// Database initialization middleware for API routes
+const ensureDB = async (req, res, next) => {
+  if (req.path.startsWith('/api/') && !req.path.includes('/test')) {
+    try {
+      await getDBConnection();
+      next();
+    } catch (error) {
+      console.error("Database not available:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Database connection failed",
+        error: error.message
+      });
+    }
+  } else {
+    next();
+  }
+};
+
+app.use(ensureDB);// api endpoints
 app.use("/api/admin", adminRouter);
 app.use("/api/doctor", doctorRouter);
 app.use("/api/user", userRouter);
@@ -130,11 +146,24 @@ app.get("/api/status", async (req, res) => {
       3: 'disconnecting'
     };
     
+    // Try to connect if not connected
+    if (dbStatus === 0) {
+      try {
+        await getDBConnection();
+      } catch (error) {
+        console.error("Connection attempt failed:", error);
+      }
+    }
+    
+    const currentStatus = mongoose.default.connection.readyState;
+    
     res.json({
       success: true,
-      database: statusMap[dbStatus] || 'unknown',
-      services_initialized: isInitialized,
+      database: statusMap[currentStatus] || 'unknown',
+      database_connection: dbConnection,
       environment: process.env.VERCEL ? "vercel-serverless" : "local",
+      mongodb_uri_present: !!process.env.MONGODB_URI,
+      jwt_secret_present: !!process.env.JWT_SECRET,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
